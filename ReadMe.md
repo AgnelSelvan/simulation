@@ -16,5 +16,5 @@ The particles are attracted to each other by a force which is inversely proporti
 ```
 
 ## Outputs
-<img src="./outputs/1.png" width="500" />
-<img src="./outputs/2.png" width="500" />
+<img src="./life_from_simple_rules/outputs/1.png" width="500" />
+<img src="./life_from_simple_rules/outputs/2.png" width="500" />

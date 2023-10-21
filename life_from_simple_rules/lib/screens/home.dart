@@ -48,8 +48,8 @@ class _ParticleScreenState extends State<ParticleScreen> {
   double greenXRed = -.01;
   double greenXYellow = -.1;
 
-  double minG = -2;
-  double maxG = 2;
+  double minG = -10;
+  double maxG = 10;
   double minSpeed = 0;
   double maxSpeed = 1;
 
@@ -148,7 +148,7 @@ class _ParticleScreenState extends State<ParticleScreen> {
     super.initState();
   }
 
-  startTimer() {
+  void startTimer() {
     //   fps microseconds: ((1000 / 60) * 1000).toInt()
     if (timer == null) {
       timer ??= Timer.periodic(
@@ -275,31 +275,58 @@ class _ParticleScreenState extends State<ParticleScreen> {
           children: [
             if (isMobileView)
               SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: _particlePainter(),
-                  ))
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: _particlePainter(),
+                ),
+              )
             else
               Positioned(
                 top: 0,
                 left: lifeControlsWidth,
                 child: _particlePainter(),
               ),
-            if (MediaQuery.of(context).size.width < minScreenWidthToShowControl)
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: IconButton(
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (MediaQuery.of(context).size.width <
+                        minScreenWidthToShowControl)
+                      IconButton(
+                        onPressed: () {
+                          canShowControl = !canShowControl;
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.settings),
+                      ),
+                    IconButton(
                       onPressed: () {
-                        canShowControl = !canShowControl;
+                        if (timer == null) {
+                          startTimer();
+                          return;
+                        }
+                        timer?.cancel();
+                        timer = null;
                         setState(() {});
                       },
-                      icon: const Icon(Icons.settings)),
+                      icon:
+                          Icon(timer != null ? Icons.pause : Icons.play_arrow),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        infoDialog();
+                      },
+                      icon: const Icon(Icons.info_outline),
+                    ),
+                  ],
                 ),
               ),
+            ),
             if (MediaQuery.of(context).size.width < minScreenWidthToShowControl)
               if (canShowControl)
                 _particleController(context)
@@ -310,6 +337,33 @@ class _ParticleScreenState extends State<ParticleScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> infoDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Text('Info'),
+          contentPadding: const EdgeInsets.all(10),
+          children: [
+            'This is a simple particle simulation.',
+            'You can change the speed, radius and count of particles.',
+            'You can also change the interaction between particles by changing the values of\nRedXRed, RedXYellow, RedXGreen, GreenXGreen, GreenXRed, GreenXYellow, YellowXYellow, YellowXGreen, YellowXRed.\nMin values result in attraction and max values result in repulsion.',
+            'You can also pause the simulation and change the values.',
+          ]
+              .map(
+                (e) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                  ),
+                  child: Text(e),
+                ),
+              )
+              .toList(),
+        );
+      },
     );
   }
 
@@ -374,7 +428,6 @@ class _ParticleScreenState extends State<ParticleScreen> {
                 );
 
                 startTimer();
-                setState(() {});
               },
               max: 800,
               min: 0,
@@ -486,7 +539,6 @@ class _ParticleScreenState extends State<ParticleScreen> {
                 );
 
                 startTimer();
-                setState(() {});
               },
               max: 800,
               min: 0,
@@ -598,7 +650,6 @@ class _ParticleScreenState extends State<ParticleScreen> {
                 );
 
                 startTimer();
-                setState(() {});
               },
               max: 800,
               min: 0,
